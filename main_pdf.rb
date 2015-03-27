@@ -28,24 +28,28 @@ class MainPdf < Prawn::Document
 
         int.each_slice(12) do |group|
           count += 1
-          english_row = [{ content: english, colspan: 4 }]
-          english_table = make_table(group.unshift(english_row), header: true, width: WIDTH)
-          table_data << [{ content: english_table, colspan: 4 }]
+          table_data << [{ content: english_table(english, group), colspan: 4 }]
           break if count > needed_count
 
-          spanish_row = [{ content: spanish, colspan: 4 }]
-          spanish_table = make_table([spanish_row] + table_data, header: true, width: WIDTH)
-          data << [{ content: spanish_table, colspan: 4 }]
-          table_data = table_data.clear
+          data << [{ content: spanish_table(spanish, table_data), colspan: 4 }]
+          table_data.clear
         end
       end
-
-      spanish_row = [{ content: spanish, colspan: 4 }]
-      spanish_table = make_table([spanish_row] + table_data, header: true, width: WIDTH)
-      data << [{ content: spanish_table, colspan: 4 }]
-      table_data = table_data.clear
+      
+      data << [{ content: spanish_table(spanish, table_data), colspan: 4 }]
+      table_data.clear
     end
 
     table([HEADER] + data, header: true, width: WIDTH)
+  end
+
+  def english_table(header, content)
+    header_row = [{ content: header, colspan: 4 }]
+    make_table(content.unshift(header_row), header: true, width: WIDTH)
+  end
+
+  def spanish_table(header, content)
+    header_row = [{ content: header, colspan: 4 }]
+    make_table([header_row] + content, header: true, width: WIDTH)
   end
 end
